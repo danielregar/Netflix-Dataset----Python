@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Load the dataset
-df = pd.read_csv(r"D:\Data Analyst\Project\Netflix TV and Shows\Netflix_movies_and_tv_shows_clustering.csv")
+df = pd.read_csv(r"...\Netflix_movies_and_tv_shows_clustering.csv")
 df  # Display the first few rows
 
 # Check for duplicate records
