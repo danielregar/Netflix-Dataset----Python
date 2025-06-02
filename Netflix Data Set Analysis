@@ -1,0 +1,133 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the dataset
+df = pd.read_csv(r"D:\Data Analyst\Project\Netflix TV and Shows\Netflix_movies_and_tv_shows_clustering.csv")
+df  # Display the first few rows
+
+# Check for duplicate records
+df.duplicated().sum()
+
+# Check the structure and basic info of the dataset
+df.info()
+df.shape
+
+# Check for missing values in each column
+df.isna().sum()
+
+# Standardize the 'date_added' column and extract year & month
+df['date_added'] = pd.to_datetime(df['date_added'], format='mixed')
+df['year_added'] = df['date_added'].dt.year
+df['month_added'] = df['date_added'].dt.month
+
+# Total Content Added by Year
+# Count the number of content added each year (ignoring NaN), then sort by year
+content_added_by_year = df['year_added'].value_counts(dropna=True).sort_index()
+
+# Plotting the results
+plt.figure(figsize=(12,6))
+sns.barplot(x=content_added_by_year.index, y=content_added_by_year.values)
+plt.title('Total Content Added to Netflix by Year')
+plt.xlabel('Year Added')
+plt.ylabel('Total Content')
+plt.tight_layout()
+
+# 📅 Total Content Added by Month
+content_added_by_month = df['month_added'].value_counts(dropna=True).sort_index()
+plt.figure(figsize=(12,6))
+sns.barplot(x=content_added_by_month.index, y=content_added_by_month.values)
+plt.title('Content Added to Netflix by Month')
+plt.xlabel('Month Added')
+plt.ylabel('Total Content')
+plt.tight_layout()
+
+# 🎬 Movies vs TV Shows Added by Year
+type_by_year = df.groupby(['year_added', 'type'], dropna=True).size().unstack()
+type_by_year.plot(kind='bar', stacked=True, figsize=(12,6))
+plt.title('Movies vs TV Shows Added by Year')
+plt.xlabel('Year Added')
+plt.ylabel('Total Content')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# 📆 Movies vs TV Shows Added by Month
+type_by_month = df.groupby(['month_added', 'type'], dropna=True).size().unstack()
+type_by_month.plot(kind='bar', stacked=True, figsize=(12,6))
+plt.title('Movies vs TV Shows Added by Month')
+plt.xlabel('Month Added')
+plt.ylabel('Total Content')
+plt.xticks(rotation=360)
+plt.tight_layout()
+
+# 🌍 Top 10 Countries Providing the Most Content to Netflix
+# Drop rows with missing 'country' values
+df_clean = df.dropna(subset=['country'])
+
+# Split multiple countries and count occurrences
+countries_split = df_clean['country'].apply(lambda x: x.split(', ')).sum()
+
+from collections import Counter
+countries_split_count = Counter(countries_split).most_common(10) 
+
+# Unpack and plot
+countries, count_countries = zip(*countries_split_count)
+plt.figure(figsize=(12,6))
+sns.barplot(x=countries, y=count_countries)
+plt.title('Top 10 Countries Providing the Most Content to Netflix')
+plt.xlabel('Countries')
+plt.ylabel('Total Content')
+plt.tight_layout()
+
+# 🎬 Top 10 Directors Providing the Most Content to Netflix
+df_clean = df.dropna(subset=['director'])
+director_split = df_clean['director'].apply(lambda x: x.split(', ')).sum()
+director_split_count = Counter(director_split).most_common(10)
+director, count_director = zip(*director_split_count)
+
+plt.figure(figsize=(12,6))
+sns.barplot(x=director, y=count_director)
+plt.title('Top 10 Directors Providing the Most Content to Netflix')
+plt.xlabel('Director')
+plt.ylabel('Total Content')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# 🎭 Top 10 Cast Members Providing the Most Content to Netflix
+df_clean = df.dropna(subset=['cast'])
+cast_split = df_clean['cast'].apply(lambda x: x.split(', ')).sum()
+cast_split_count = Counter(cast_split).most_common(10)
+cast, count_Cast = zip(*cast_split_count)
+
+plt.figure(figsize=(12,6))
+sns.barplot(x=cast, y=count_Cast)
+plt.title('Top 10 Cast Providing the Most Content to Netflix')
+plt.xlabel('Cast')
+plt.ylabel('Total Content')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# 🏷️ Total Content by Rating
+rating_group = df['rating'].value_counts(dropna=True).sort_values(ascending=False)
+
+plt.figure(figsize=(12,6))
+sns.barplot(x=rating_group.index, y=rating_group.values)
+plt.title('Content Added by Rating')
+plt.xlabel('Rating')
+plt.ylabel('Total Content')
+plt.tight_layout()
+
+# 🎞️ Top 10 Genres / Categories Providing the Most Content to Netflix
+df_clean = df.dropna(subset=['listed_in'])
+genre_split = df_clean['listed_in'].apply(lambda x: x.split(', ')).sum()
+genre_split_count = Counter(genre_split).most_common(10)
+genre, split_genre = zip(*genre_split_count)
+
+plt.figure(figsize=(12,6))
+sns.barplot(x=genre, y=split_genre)
+plt.title('Top 10 Genres Providing the Most Content to Netflix')
+plt.xlabel('Genre')
+plt.ylabel('Total Content')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
